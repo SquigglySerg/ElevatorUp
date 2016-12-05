@@ -9,7 +9,7 @@ using namespace std;
 
 
 struct Event{
-  enum Type{ARRIVE, BOARD, UNBOARD, EMPTY };
+  enum Type{ARRIVE, BOARD, UNBOARD, EMPTY, GROUND };
 
   Type type;
   double time;
@@ -24,7 +24,7 @@ struct EventComparator {
 };
 
 vector<vector<int> > states;
-priority_queue<Event*, std::vector<const Event*>, EventComparator> events;
+priority_queue<Event*, std::vector<Event*>, EventComparator> events;
 vector<int> employeesWaiting; //Stores the poeple waiting on the ground floor by storing the floor the employee works at.
 
 int FLOORS;
@@ -122,7 +122,36 @@ int main(int argc, char* argv[]){
   DAYS = atoi(argv[7]);
   
   
-  
+  for(unsigned int day = 0; day < DAYS; day++){
+    //Initialize simulation
+    Event* firstArrival = new Event;
+    firstArrival->type = Event::ARRIVE;
+    firstArrival->time = 0;
+    firstArrival->floor = 1;
+    
+    events.push(firstArrival);
+    employeesWaiting.push_back(1);
+    
+    Event* firstBoard = new Event;
+    firstBoard->type = Event::BOARD;
+    firstBoard->time = 0;
+    
+    events.push(firstBoard);
+
+    while(!events.empty()){
+      Event* currentEvent = events.top();
+      
+      switch(currentEvent->type){
+        case Event::ARRIVE:
+          handleArrival(currentEvent);
+	  break;
+        default:
+	  return -2;
+      }
+    }
+  }
+
+
 }
 
 
