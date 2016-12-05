@@ -13,6 +13,7 @@ struct Event{
 
   Type type;
   double time;
+  int floor;
 };
 
 struct EventComparator {
@@ -24,7 +25,7 @@ struct EventComparator {
 
 vector<vector<int> > states;
 priority_queue<Event*, std::vector<const Event*>, EventComparator> events;
-queue<int> employeesWaiting; //Stores the poeple waiting on the ground floor by storing the floor the employee works at.
+vector<int> employeesWaiting; //Stores the poeple waiting on the ground floor by storing the floor the employee works at.
 
 int FLOORS;
 int ELEVATORS;
@@ -68,12 +69,31 @@ double inverseLambda(double y, int floor){
   }
 }
 
-void generateArrivals(){
+double generateArrival(double previousArrival, int floor){
+  double u = bigLambda(previousArrival, floor);
+  double randNum;
+  pRNG >> randNum;
+        
+  u = u + (-1*log(randNum));
+  return inverseLambda(u, floor);
+}
+
+void handleArrival(Event* e){
+  events.pop();
+  
+  double nextA = generateArrival(e->time, e->floor);
+  if( nextA <= GAP*(e->floor-1)+B+A ){
+    Event* ne = new Event;
+    ne->type = Event::ARRIVE;
+    ne->time = nextA;
+    ne->floor = e->floor;
+    
+    events.push(ne);
+    employeesWaiting.push_back(ne->floor);
+  }
   
   
 }
-
-
 
 
 
