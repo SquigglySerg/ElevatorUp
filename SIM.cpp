@@ -14,6 +14,7 @@ struct Event{
   Type type;
   double time;
   int floor;
+  int elevator;
 };
 
 struct EventComparator {
@@ -23,7 +24,14 @@ struct EventComparator {
 
 };
 
-vector<vector<int> > states;
+struct Elevator{
+  int currentFloor;
+  int numPeople;
+  vector<int> peoplePerFloor;
+  
+};
+
+vector<Elevator> elevators;
 priority_queue<Event*, std::vector<Event*>, EventComparator> events;
 vector<int> employeesWaiting; //Stores the poeple waiting on the ground floor by storing the floor the employee works at.
 
@@ -95,7 +103,9 @@ void handleArrival(Event* e){
   
 }
 
-
+void handleBoard(Event* e){
+  
+}
 
 
 
@@ -122,7 +132,7 @@ int main(int argc, char* argv[]){
   DAYS = atoi(argv[7]);
   
   
-  for(unsigned int day = 0; day < DAYS; day++){
+  for(int day = 0; day < DAYS; day++){
     //Initialize simulation
     Event* firstArrival = new Event;
     firstArrival->type = Event::ARRIVE;
@@ -135,6 +145,7 @@ int main(int argc, char* argv[]){
     Event* firstBoard = new Event;
     firstBoard->type = Event::BOARD;
     firstBoard->time = 0;
+    firstBoard->elevator = 1;
     
     events.push(firstBoard);
 
@@ -145,7 +156,10 @@ int main(int argc, char* argv[]){
         case Event::ARRIVE:
           handleArrival(currentEvent);
 	  break;
-        default:
+        case Event::BOARD:
+	  handleBoard(currentEvent);
+	  break;
+	default:
 	  return -2;
       }
     }
