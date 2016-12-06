@@ -144,21 +144,22 @@ void handleBoard(Event* e){
     int peopleBoarding = (ELE_CAP > peopleWaiting? peopleWaiting : ELE_CAP);
     currentEle->numPeople = peopleBoarding;
 
-    cout << "Before erasing" << endl;
-    for(int i=0; i < employeesWaiting.size(); i++){
-      cout << employeesWaiting[i] << " ";
-    }
+    // cout << "Before erasing" << endl;
+    // for(int i=0; i < employeesWaiting.size(); i++){
+    //   cout << employeesWaiting[i] << " ";
+    // }
+
     // board the first ten to current Elevator
     for (int i = 0; i < peopleBoarding; i++){
       int targetFloor = employeesWaiting[i];
       currentEle->peoplePerFloor[targetFloor] ++;
     }
-    cout << endl << "Now erase" << endl;
+    // cout << endl << "Now erase" << endl;
     employeesWaiting.erase(employeesWaiting.begin(), employeesWaiting.begin() + peopleWaiting);
-    for(int i=0; i < employeesWaiting.size(); i++){
-      cout << employeesWaiting[i] << " ";
-    }
-    cout << endl;
+    // for(int i=0; i < employeesWaiting.size(); i++){
+    //   cout << employeesWaiting[i] << " ";
+    // }
+    // cout << endl;
 
     int bTime = boardingTime[peopleBoarding];
     // enqueue first UNBOARD
@@ -168,18 +169,19 @@ void handleBoard(Event* e){
     int unbTime;
     for (firstUnbFloor = currentFloor; firstUnbFloor <= FLOORS; firstUnbFloor++) {
       int pPerFloor = currentEle->peoplePerFloor[firstUnbFloor];
-      cout << "pPerFloor " << pPerFloor << " at floor " << firstUnbFloor << endl;
+      // cout << "pPerFloor " << pPerFloor << " at floor " << firstUnbFloor << endl;
       if (pPerFloor != 0 ) {
         unbTime = boardingTime[pPerFloor];
         break;
       }
     }
     firstUnboard->elevator = currentEleIndex;
-    cout << "currentFloor, firstUnbFloor" << currentFloor << " " << firstUnbFloor;
+    // cout << "currentFloor, firstUnbFloor" << currentFloor << " " << firstUnbFloor;
     firstUnboard->time = e->time + bTime + unbTime + eTime(currentFloor, firstUnbFloor);
-    cout << "bTime + unbTime + eTime " << bTime << " " << unbTime << " " << eTime(currentFloor, firstUnbFloor) << endl;
-    int tmp;
-    cin >> tmp;
+    // cout << "bTime + unbTime + eTime " << bTime << " " << unbTime << " " << eTime(currentFloor, firstUnbFloor) << endl;
+    // cout << "unboard time " << firstUnboard->time << endl;
+    // int tmp;
+    // cin >> tmp;
     firstUnboard->floor = firstUnbFloor;
     events.push(firstUnboard);
     // mark the elevator used
@@ -308,14 +310,14 @@ int main(int argc, char* argv[]){
       Event* currentEvent = events.top();
       switch(currentEvent->type){
         case Event::ARRIVE:
-        // cout << "Current Event Time " << currentEvent->time << ":  ";
-        // cout << "arrival" << endl;
+        cout << "Current Event Time " << currentEvent->time << ":  ";
+        cout << "arrival" << endl;
         // cin >> temp;
         handleArrival(currentEvent);
         break;
         case Event::BOARD:
-        // cout << "Current Event Time " << currentEvent->time << ":  ";
-        // cout << "board" << endl;
+        cout << "Current Event Time " << currentEvent->time << ":  ";
+        cout << "board" << endl;
         // cin >> temp;
         handleBoard(currentEvent);
         break;
