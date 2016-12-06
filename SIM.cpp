@@ -41,6 +41,8 @@ int ELEVATORS;
 int DAYS;
 const int PEOPLE = 100;
 const int ELE_CAP = 10;
+const int boardingTime[11] = {0, 3, 5,	7,	9,	11,	13,	15,	17,	19,	22};
+
 double G;
 double A;
 double B;
@@ -48,6 +50,16 @@ double GAP;
 ifstream pRNG;
 
 
+int eTime (int startFloor, int endFloor) {
+    int floorsTraveled = abs(endFloor - startFloor);
+    if (floorsTraveled == 0) {
+        return 0;
+    } else if (floorsTraveled == 1) {
+        return 8;
+    } else {
+        return (2 * 8 + 5 * ( floorsTraveled - 2));
+    }
+}
 
 double bigLambda(double t, int floor){
   double p = B + ((floor-1)*GAP);
@@ -106,18 +118,38 @@ void handleArrival(Event* e){
 }
 
 void handleBoard(Event* e){
-  int currentEle = e->elevator;
+  int currentEleIndex = e->elevator;
+  Elevator* currentEle = elevators[currentEleIndex];
+
+  int currentFloor = currentEle->currentFloor;
   int peopleWaiting = employeesWaiting.size();
   if (peopleWaiting > 0) {
-      // board the first ten to current Elevator
       int peopleBoarding = (ELE_CAP > peopleWaiting? peopleWaiting : ELE_CAP);
-      elevators[currentEle]->numPeople = peopleBoarding;
-      for (int i = 0; i < ELE_CAP && i < peopleWaiting; i++) {
-          // modify the elevators
-          int targetFloor = employeesWaiting[i];
-          elevators[currentEle]->peoplePerFloor[targetFloor -1] ++;
+      currentEle->numPeople = peopleBoarding;
 
+      // board the first ten to current Elevator
+      for (int i = 0; i < ELE_CAP && i < peopleWaiting; i++) {
+          int targetFloor = employeesWaiting[i];
+          currentEle->peoplePerFloor[targetFloor] ++;
       }
+      employeesWaiting.erase(employeesWaiting.begin(), employeesWaiting.begin() + peopleWaiting);
+      int bTime = boardingTime[peopleBoarding];
+      // enqueue first UNBOARD
+      Event* firstUnboard = new Event;
+      firstUnboard->type = Event::UNBOARD;
+      int firstUnbFloor = 0;
+      int unbTime;
+      for (int firstUnbFloor = currentFloor; firstUnbFloor <= FLOORS; firstUnbFloor++) {
+          int pPerFloor = currentEle->peoplePerFloor[firstUnbFloor];
+          if (pPerFloor != 0 ) {
+              unbTime = boardingTime[pPerFloor];
+              break;
+          }
+      }
+
+      firstUnboard->time = bTime + unbTime + eTime(currentFloor, firstUnbFloor);
+      firstUnboard->floor = firstUnbFloor;
+      events.push(firstUnboard);
   }
 }
 
@@ -137,8 +169,8 @@ void initializeSim() {
         ele->index = i;
         ele->currentFloor = 0;
         ele->numPeople = 0;
-        ele->peoplePerFloor.resize(FLOORS);
-        ele->peoplePerFloor.assign(FLOORS, 0);
+        ele->peoplePerFloor.resize(FLOORS + 1); // floors indexed from 0
+        ele->peoplePerFloor.assign(FLOORS + 1, 0);
         elevators.push_back(ele);
 
         Event* firstBoard = new Event;
@@ -189,6 +221,9 @@ int main(int argc, char* argv[]){
         case Event::BOARD:
 	       handleBoard(currentEvent);
 	       break;
+        case Event::UNBOARD:
+   	 //       handleUnboard(currentEvent);
+   	       break;
 	    default:
 	       return -2;
       }
