@@ -118,6 +118,8 @@ void handleArrival(Event* e){
 }
 
 void handleBoard(Event* e){
+    events.pop();
+
   int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
 
@@ -146,14 +148,51 @@ void handleBoard(Event* e){
               break;
           }
       }
-
+      firstUnboard->elevator = currentEleIndex;
       firstUnboard->time = bTime + unbTime + eTime(currentFloor, firstUnbFloor);
       firstUnboard->floor = firstUnbFloor;
       events.push(firstUnboard);
   }
 }
 
+void handleUnboard(Event* e) {
+    events.pop();
 
+    int currentEleIndex = e->elevator;
+    Elevator* currentEle = elevators[currentEleIndex];
+    int currentFloor = e->floor;
+    currentEle->currentFloor = currentFloor;
+    // handle UNBOARD
+    int peopleToGo = currentEle->peoplePerFloor[currentFloor];
+    currentEle->peoplePerFloor[currentFloor] = 0;
+    currentEle->numPeople -= peopleToGo;
+    // add new UNBOARD, if empty add EMPTY
+
+    if (currentEle->numPeople == 0) {
+        // EMPTY
+        Event* empty = new Event;
+        empty->type = Event::EMPTY;
+        empty->time =  eTime(currentFloor, 0);
+        empty->floor = 0;
+        events.push(empty);
+    } else {
+        // NEXT UNBOARD
+        Event* unboard = new Event;
+        unboard->type = Event::UNBOARD;
+        int firstUnbFloor = 0;
+        int unbTime;
+        for (int firstUnbFloor = currentFloor; firstUnbFloor <= FLOORS; firstUnbFloor++) {
+            int pPerFloor = currentEle->peoplePerFloor[firstUnbFloor];
+            if (pPerFloor != 0 ) {
+                unbTime = boardingTime[pPerFloor];
+                break;
+            }
+        }
+        unboard->time =  unbTime + eTime(currentFloor, firstUnbFloor);
+        unboard->floor = firstUnbFloor;
+        events.push(unboard);
+    }
+}
 void initializeSim() {
     Event* firstArrival = new Event;
     firstArrival->type = Event::ARRIVE;
@@ -222,7 +261,7 @@ int main(int argc, char* argv[]){
 	       handleBoard(currentEvent);
 	       break;
         case Event::UNBOARD:
-   	 //       handleUnboard(currentEvent);
+   	       handleUnboard(currentEvent);
    	       break;
 	    default:
 	       return -2;
