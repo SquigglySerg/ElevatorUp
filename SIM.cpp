@@ -126,7 +126,6 @@ void handleArrival(Event* e){
       board->time = e->time; // numeric_limits<double>::min(); // smallest double > 0
       board->elevator = i;
       events.push(board);
-      // break;
     }
   }
 
@@ -144,22 +143,14 @@ void handleBoard(Event* e){
     int peopleBoarding = (ELE_CAP > peopleWaiting? peopleWaiting : ELE_CAP);
     currentEle->numPeople = peopleBoarding;
 
-    // cout << "Before erasing" << endl;
-    // for(int i=0; i < employeesWaiting.size(); i++){
-    //   cout << employeesWaiting[i] << " ";
-    // }
-
     // board the first ten to current Elevator
     for (int i = 0; i < peopleBoarding; i++){
       int targetFloor = employeesWaiting[i];
       currentEle->peoplePerFloor[targetFloor] ++;
     }
-    // cout << endl << "Now erase" << endl;
+
+    // update the waiting list
     employeesWaiting.erase(employeesWaiting.begin(), employeesWaiting.begin() + peopleWaiting);
-    // for(int i=0; i < employeesWaiting.size(); i++){
-    //   cout << employeesWaiting[i] << " ";
-    // }
-    // cout << endl;
 
     int bTime = boardingTime[peopleBoarding];
     // enqueue first UNBOARD
@@ -176,14 +167,10 @@ void handleBoard(Event* e){
       }
     }
     firstUnboard->elevator = currentEleIndex;
-    // cout << "currentFloor, firstUnbFloor" << currentFloor << " " << firstUnbFloor;
     firstUnboard->time = e->time + bTime + unbTime + eTime(currentFloor, firstUnbFloor);
-    // cout << "bTime + unbTime + eTime " << bTime << " " << unbTime << " " << eTime(currentFloor, firstUnbFloor) << endl;
-    // cout << "unboard time " << firstUnboard->time << endl;
-    // int tmp;
-    // cin >> tmp;
     firstUnboard->floor = firstUnbFloor;
     events.push(firstUnboard);
+
     // mark the elevator used
     currentEle->currentFloor = firstUnbFloor;
   }
@@ -194,12 +181,13 @@ void handleUnboard(Event* e) {
 
   int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
-  int currentFloor = currentEle->currentFloor; //e->floor;
-  //currentEle->currentFloor = currentFloor;
+  int currentFloor = currentEle->currentFloor;
+
   // handle UNBOARD
   int peopleToGo = currentEle->peoplePerFloor[currentFloor];
   currentEle->peoplePerFloor[currentFloor] = 0;
   currentEle->numPeople -= peopleToGo;
+
   // add new UNBOARD, if empty add GROUND
 
   if (currentEle->numPeople == 0) {
@@ -270,12 +258,6 @@ void initializeSim() {
     ele->peoplePerFloor.resize(FLOORS + 1); // floors indexed from 0
     ele->peoplePerFloor.assign(FLOORS + 1, 0);
     elevators.push_back(ele);
-    // // generate BOARD event
-    // Event* firstBoard = new Event;
-    // firstBoard->type = Event::BOARD;
-    // firstBoard->time = numeric_limits<double>::min(); // smallest double > 0
-    // firstBoard->elevator = i;
-    // events.push(firstBoard);
   }
 }
 
