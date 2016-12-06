@@ -176,12 +176,14 @@ void handleBoard(Event* e){
     }
     firstUnboard->elevator = currentEleIndex;
     cout << "currentFloor, firstUnbFloor" << currentFloor << " " << firstUnbFloor;
-    firstUnboard->time = bTime + unbTime + eTime(currentFloor, firstUnbFloor);
+    firstUnboard->time = e->time + bTime + unbTime + eTime(currentFloor, firstUnbFloor);
     cout << "bTime + unbTime + eTime " << bTime << " " << unbTime << " " << eTime(currentFloor, firstUnbFloor) << endl;
     int tmp;
     cin >> tmp;
     firstUnboard->floor = firstUnbFloor;
     events.push(firstUnboard);
+    // mark the elevator used
+    currentEle->currentFloor = firstUnbFloor;
   }
 }
 
@@ -190,8 +192,8 @@ void handleUnboard(Event* e) {
 
   int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
-  int currentFloor = e->floor;
-  currentEle->currentFloor = currentFloor;
+  int currentFloor = currentEle->currentFloor; //e->floor;
+  //currentEle->currentFloor = currentFloor;
   // handle UNBOARD
   int peopleToGo = currentEle->peoplePerFloor[currentFloor];
   currentEle->peoplePerFloor[currentFloor] = 0;
@@ -203,7 +205,7 @@ void handleUnboard(Event* e) {
     Event* ground = new Event;
     ground->type = Event::GROUND;
     ground->elevator = currentEleIndex;
-    ground->time =  eTime(currentFloor, 0);
+    ground->time =  e->time + eTime(currentFloor, 0);
     ground->floor = 0;
     events.push(ground);
   } else {
@@ -220,9 +222,11 @@ void handleUnboard(Event* e) {
       }
     }
     unboard->elevator = currentEleIndex;
-    unboard->time =  unbTime + eTime(currentFloor, firstUnbFloor);
+    unboard->time =  e->time + unbTime + eTime(currentFloor, firstUnbFloor);
     unboard->floor = firstUnbFloor;
     events.push(unboard);
+
+    currentEle->currentFloor = firstUnbFloor;
   }
 }
 
@@ -304,17 +308,19 @@ int main(int argc, char* argv[]){
       Event* currentEvent = events.top();
       switch(currentEvent->type){
         case Event::ARRIVE:
+        // cout << "Current Event Time " << currentEvent->time << ":  ";
         // cout << "arrival" << endl;
         // cin >> temp;
         handleArrival(currentEvent);
         break;
         case Event::BOARD:
+        // cout << "Current Event Time " << currentEvent->time << ":  ";
         // cout << "board" << endl;
         // cin >> temp;
         handleBoard(currentEvent);
         break;
         case Event::UNBOARD:
-        cout << "Current Event Time" << currentEvent->time << endl;
+        cout << "Current Event Time " << currentEvent->time << ":  ";
         cout << "unboard" << endl;
         cin >> temp;
         handleUnboard(currentEvent);
