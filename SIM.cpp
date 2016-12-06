@@ -4,7 +4,7 @@
 #include <fstream>
 #include <cmath>
 #include <stdlib.h>
-
+#include <limits>
 using namespace std;
 
 
@@ -97,23 +97,38 @@ double generateArrival(double previousArrival, int floor){
   pRNG >> randNum;
 
   u = u + (-1*log(randNum));
+
   return inverseLambda(u, floor);
 }
 
 void handleArrival(Event* e){
   events.pop();
 
+  employeesWaiting.push_back(e->floor);
+
   double nextA = generateArrival(e->time, e->floor);
+
   if( nextA <= GAP*(e->floor-1)+B+A ){
     Event* ne = new Event;
     ne->type = Event::ARRIVE;
     ne->time = nextA;
     ne->floor = e->floor;
-
     events.push(ne);
-    employeesWaiting.push_back(ne->floor);
   }
 
+  // check elevators, try to generate BOARD;
+  for (int i = 0; i < ELEVATORS; i++) {
+    Elevator* ele = elevators[i];
+    if (ele->currentFloor == 0) {
+      // BOARD
+      Event* board = new Event;
+      board->type = Event::BOARD;
+      board->time = e->time; // numeric_limits<double>::min(); // smallest double > 0
+      board->elevator = i;
+      events.push(board);
+      // break;
+    }
+  }
 
 }
 
@@ -129,27 +144,42 @@ void handleBoard(Event* e){
     int peopleBoarding = (ELE_CAP > peopleWaiting? peopleWaiting : ELE_CAP);
     currentEle->numPeople = peopleBoarding;
 
+    cout << "Before erasing" << endl;
+    for(int i=0; i < employeesWaiting.size(); i++){
+      cout << employeesWaiting[i] << " ";
+    }
     // board the first ten to current Elevator
-    for (int i = 0; i < ELE_CAP && i < peopleWaiting; i++){
+    for (int i = 0; i < peopleBoarding; i++){
       int targetFloor = employeesWaiting[i];
       currentEle->peoplePerFloor[targetFloor] ++;
     }
+    cout << endl << "Now erase" << endl;
     employeesWaiting.erase(employeesWaiting.begin(), employeesWaiting.begin() + peopleWaiting);
+    for(int i=0; i < employeesWaiting.size(); i++){
+      cout << employeesWaiting[i] << " ";
+    }
+    cout << endl;
+
     int bTime = boardingTime[peopleBoarding];
     // enqueue first UNBOARD
     Event* firstUnboard = new Event;
     firstUnboard->type = Event::UNBOARD;
     int firstUnbFloor = 0;
     int unbTime;
-    for (int firstUnbFloor = currentFloor; firstUnbFloor <= FLOORS; firstUnbFloor++) {
+    for (firstUnbFloor = currentFloor; firstUnbFloor <= FLOORS; firstUnbFloor++) {
       int pPerFloor = currentEle->peoplePerFloor[firstUnbFloor];
+      cout << "pPerFloor " << pPerFloor << " at floor " << firstUnbFloor << endl;
       if (pPerFloor != 0 ) {
         unbTime = boardingTime[pPerFloor];
         break;
       }
     }
     firstUnboard->elevator = currentEleIndex;
+    cout << "currentFloor, firstUnbFloor" << currentFloor << " " << firstUnbFloor;
     firstUnboard->time = bTime + unbTime + eTime(currentFloor, firstUnbFloor);
+    cout << "bTime + unbTime + eTime " << bTime << " " << unbTime << " " << eTime(currentFloor, firstUnbFloor) << endl;
+    int tmp;
+    cin >> tmp;
     firstUnboard->floor = firstUnbFloor;
     events.push(firstUnboard);
   }
@@ -213,16 +243,20 @@ void handleGround(Event* e) {
 }
 
 void initializeSim() {
-  Event* firstArrival = new Event;
-  firstArrival->type = Event::ARRIVE;
-  firstArrival->time = 0;
-  firstArrival->floor = 1;
+  // generate first ARRIVALs for each floor
+  for (int i = 1; i <= FLOORS; i++) {
+    Event* firstArrival = new Event;
+    firstArrival->type = Event::ARRIVE;
+    firstArrival->time = GAP * (i - 1);
+    firstArrival->floor = i;
 
-  events.push(firstArrival);
-  employeesWaiting.push_back(1);
+    events.push(firstArrival);
+  }
 
-  // initialze elevators
+
+
   for (int i = 0; i < ELEVATORS; i++) {
+    // initialze elevators
     Elevator* ele = new Elevator;
     ele->index = i;
     ele->currentFloor = 0;
@@ -230,12 +264,12 @@ void initializeSim() {
     ele->peoplePerFloor.resize(FLOORS + 1); // floors indexed from 0
     ele->peoplePerFloor.assign(FLOORS + 1, 0);
     elevators.push_back(ele);
-
-    Event* firstBoard = new Event;
-    firstBoard->type = Event::BOARD;
-    firstBoard->time = 0;
-    firstBoard->elevator = i;
-    events.push(firstBoard);
+    // // generate BOARD event
+    // Event* firstBoard = new Event;
+    // firstBoard->type = Event::BOARD;
+    // firstBoard->time = numeric_limits<double>::min(); // smallest double > 0
+    // firstBoard->elevator = i;
+    // events.push(firstBoard);
   }
 }
 
@@ -265,22 +299,30 @@ int main(int argc, char* argv[]){
     //Initialize simulation
     initializeSim();
 
-
+    int temp;
     while(!events.empty()){
       Event* currentEvent = events.top();
-
       switch(currentEvent->type){
         case Event::ARRIVE:
+        // cout << "arrival" << endl;
+        // cin >> temp;
         handleArrival(currentEvent);
         break;
         case Event::BOARD:
+        // cout << "board" << endl;
+        // cin >> temp;
         handleBoard(currentEvent);
         break;
         case Event::UNBOARD:
+        cout << "Current Event Time" << currentEvent->time << endl;
+        cout << "unboard" << endl;
+        cin >> temp;
         handleUnboard(currentEvent);
         break;
         case Event::GROUND:
-        handleGround(currentEvent);
+        // cout << "ground" << endl;
+        // cin >> temp;
+        // handleGround(currentEvent);
         break;
         default:
         return -2;
