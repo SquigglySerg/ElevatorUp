@@ -9,7 +9,7 @@ using namespace std;
 
 
 struct Event{
-  enum Type{ARRIVE, BOARD, UNBOARD, EMPTY, GROUND };
+  enum Type{ARRIVE, BOARD, UNBOARD, GROUND };
 
   Type type;
   double time;
@@ -166,15 +166,16 @@ void handleUnboard(Event* e) {
   int peopleToGo = currentEle->peoplePerFloor[currentFloor];
   currentEle->peoplePerFloor[currentFloor] = 0;
   currentEle->numPeople -= peopleToGo;
-  // add new UNBOARD, if empty add EMPTY
+  // add new UNBOARD, if empty add GROUND
 
   if (currentEle->numPeople == 0) {
-    // EMPTY
-    Event* empty = new Event;
-    empty->type = Event::EMPTY;
-    empty->time =  eTime(currentFloor, 0);
-    empty->floor = 0;
-    events.push(empty);
+    // GROUND
+    Event* ground = new Event;
+    ground->type = Event::GROUND;
+    ground->elevator = currentEleIndex;
+    ground->time =  eTime(currentFloor, 0);
+    ground->floor = 0;
+    events.push(ground);
   } else {
     // NEXT UNBOARD
     Event* unboard = new Event;
@@ -188,11 +189,29 @@ void handleUnboard(Event* e) {
         break;
       }
     }
+    unboard->elevator = currentEleIndex;
     unboard->time =  unbTime + eTime(currentFloor, firstUnbFloor);
     unboard->floor = firstUnbFloor;
     events.push(unboard);
   }
 }
+
+void handleGround(Event* e) {
+  events.pop();
+
+  int currentEleIndex = e->elevator;
+  Elevator* currentEle = elevators[currentEleIndex];
+  int currentFloor = e->floor;
+  currentEle->currentFloor = currentFloor;
+
+  // make new boarding event
+  Event* board = new Event;
+  board->type = Event::BOARD;
+  board->time = e->time;
+  board->elevator = currentEleIndex;
+  events.push(board);
+}
+
 void initializeSim() {
   Event* firstArrival = new Event;
   firstArrival->type = Event::ARRIVE;
@@ -218,9 +237,6 @@ void initializeSim() {
     firstBoard->elevator = i;
     events.push(firstBoard);
   }
-
-
-
 }
 
 int main(int argc, char* argv[]){
@@ -263,8 +279,8 @@ int main(int argc, char* argv[]){
         case Event::UNBOARD:
         handleUnboard(currentEvent);
         break;
-        case Event::UNBOARD:
-        handleUnboard(currentEvent);
+        case Event::GROUND:
+        handleGround(currentEvent);
         break;
         default:
         return -2;
