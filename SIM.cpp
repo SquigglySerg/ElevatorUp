@@ -405,8 +405,7 @@ int main(int argc, char* argv[]){
         return -2;
       }
 
-	  cout << "Number of people waiting now: " << employeesWaiting.size() << endl;
-	  cin >> temp;
+	  cout << "Number of people waiting now: " << employeesWaiting.size() << endl << endl;
     }
   }
 
