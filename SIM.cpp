@@ -268,9 +268,13 @@ void handleGround(Event* e) {
   events.pop();
 
   int currentEleIndex = e->elevator;
+
+  //Reinitializing the Elevator
   Elevator* currentEle = elevators[currentEleIndex];
-  int currentFloor = e->floor;
-  currentEle->currentFloor = currentFloor;
+  currentEle->currentFloor = e->floor; //should be 0
+  for (int i = 0; i < currentEle->peoplePerFloor.size(); i++){
+	  currentEle->peoplePerFloor[i] = 0;
+  }
 
   // make new boarding event
   Event* board = new Event;
