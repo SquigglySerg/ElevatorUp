@@ -41,7 +41,7 @@ int ELEVATORS;
 int DAYS;
 const int PEOPLE = 100;
 const int ELE_CAP = 10;
-const int boardingTime[11] = {0, 3, 5,	7,	9,	11,	13,	15,	17,	19,	22};
+const double boardingTime[11] = {0, 3/60.0, 5/60.0,	7/60.0,	9/60.0,	11/60.0,	13/60.0,	15/60.0,	17/60.0,	19/60.0,	22/60.0};
 
 double G;
 double A;
@@ -50,14 +50,14 @@ double GAP;
 ifstream pRNG;
 
 
-int eTime (int startFloor, int endFloor) {
+double eTime (int startFloor, int endFloor) {
   int floorsTraveled = abs(endFloor - startFloor);
   if (floorsTraveled == 0) {
     return 0;
   } else if (floorsTraveled == 1) {
-    return 8;
+    return 8.0/60.0;
   } else {
-    return (2 * 8 + 5 * ( floorsTraveled - 2));
+    return (2.0 * 8 + 5 * ( floorsTraveled - 2))/60.0;
   }
 }
 
@@ -200,13 +200,13 @@ void handleBoard(Event* e){
     // update the waiting list
     employeesWaiting.erase(employeesWaiting.begin(), employeesWaiting.begin() + peopleBoarding);
 
-    int bTime = boardingTime[peopleBoarding];
+    double bTime = boardingTime[peopleBoarding];
     // enqueue first UNBOARD
     Event* firstUnboard = new Event;
     firstUnboard->type = Event::UNBOARD;
     
     int firstUnbFloor = 0;
-    int unbTime;
+    double unbTime;
     for (firstUnbFloor = currentFloor; firstUnbFloor <= FLOORS; firstUnbFloor++) {
       int pPerFloor = currentEle->peoplePerFloor[firstUnbFloor];
       // cout << "pPerFloor " << pPerFloor << " at floor " << firstUnbFloor << endl;
@@ -372,10 +372,14 @@ int main(int argc, char* argv[]){
   for(int day = 0; day < DAYS; day++){
     //Initialize simulation
     initializeSim();
-	cout << "Number of people waiting: " << employeesWaiting.size() << endl;
+    int maxPeepsWaiting = 0;
 
     int temp;
     while(!events.empty()){
+      cout << "Number of people waiting: " << employeesWaiting.size() << endl;
+      if(maxPeepsWaiting < employeesWaiting.size())
+        maxPeepsWaiting = employeesWaiting.size();
+      
       Event* currentEvent = events.top();
       switch(currentEvent->type){
         case Event::ARRIVE:
@@ -397,7 +401,8 @@ int main(int argc, char* argv[]){
         handleUnboard(currentEvent);
         break;
         case Event::GROUND:
-        // cout << "ground" << endl;
+        cout << "Current Event Time " << currentEvent->time << ":  ";
+        cout << "ground" << endl;
         // cin >> temp;
         handleGround(currentEvent);
         break;
@@ -407,6 +412,7 @@ int main(int argc, char* argv[]){
 
 	  cout << "Number of people waiting now: " << employeesWaiting.size() << endl << endl;
     }
+    cout << "Max ppl waiting: " << maxPeepsWaiting << endl << endl;
   }
 
 
