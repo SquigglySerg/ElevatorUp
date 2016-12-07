@@ -329,8 +329,8 @@ int main(int argc, char* argv[]){
         cout << "Current Event Time " << currentEvent->time << ":  ";
         cout << "unboard" << endl;
         cin >> temp;
- 	events.pop();
-        ///handleUnboard(currentEvent);
+ 		//events.pop();
+        handleUnboard(currentEvent);
         break;
         case Event::GROUND:
         // cout << "ground" << endl;
