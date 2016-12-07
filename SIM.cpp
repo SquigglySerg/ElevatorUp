@@ -126,6 +126,7 @@ void handleArrival(Event* e){
       board->time = e->time; // numeric_limits<double>::min(); // smallest double > 0
       board->elevator = i;
       events.push(board);
+      break;
     }
   }
 
@@ -137,7 +138,7 @@ void handleBoard(Event* e){
   int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
 
-  int currentFloor = currentEle->currentFloor;
+  int currentFloor =  0; currentEle->currentFloor;
   int peopleWaiting = employeesWaiting.size();
   if (peopleWaiting > 0) {
     int peopleBoarding = (ELE_CAP > peopleWaiting? peopleWaiting : ELE_CAP);
@@ -156,6 +157,7 @@ void handleBoard(Event* e){
     // enqueue first UNBOARD
     Event* firstUnboard = new Event;
     firstUnboard->type = Event::UNBOARD;
+    
     int firstUnbFloor = 0;
     int unbTime;
     for (firstUnbFloor = currentFloor; firstUnbFloor <= FLOORS; firstUnbFloor++) {
@@ -173,12 +175,32 @@ void handleBoard(Event* e){
 
     // mark the elevator used
     currentEle->currentFloor = firstUnbFloor;
+    cout << "Unboard created at time = " << firstUnboard->time << endl;
   }
 }
 
 void handleUnboard(Event* e) {
   events.pop();
-
+  
+  /*int peopleOff = elevators[e->elevator]->peoplePerFloor[e->floor];
+  int currentFloor = e->floor;
+  
+  if(currentFloor !=  elevators[e->elevator]->currentFloor){
+    cerr << "WRONG FLOOR!! " << currentFloor << " != " << elevators[e->elevator]->currentFloor << endl;
+  }
+  
+  
+  
+  elevators[e->elevator]->peoplePerFloor[e->floor] = 0;
+  elevators[e->elevator]->numPeople -= peopleOff;
+  elevators[e->elevator]->currentFloor = e->floor;
+  
+  if(elevators[e->elevator]->numPeople > 0){
+    
+  }*/
+  
+  
+  
   int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
   int currentFloor = currentEle->currentFloor;
@@ -307,7 +329,8 @@ int main(int argc, char* argv[]){
         cout << "Current Event Time " << currentEvent->time << ":  ";
         cout << "unboard" << endl;
         cin >> temp;
-        handleUnboard(currentEvent);
+ 	events.pop();
+        ///handleUnboard(currentEvent);
         break;
         case Event::GROUND:
         // cout << "ground" << endl;
