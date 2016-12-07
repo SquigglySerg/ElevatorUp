@@ -222,7 +222,7 @@ void handleBoard(Event* e){
 
     // mark the elevator used
     currentEle->currentFloor = firstUnbFloor;
-    cout << "Unboard created at time = " << firstUnboard->time << endl;
+    //cout << "Unboard created at time = " << firstUnboard->time << endl;
   }
 }
 
@@ -369,40 +369,40 @@ int main(int argc, char* argv[]){
   DAYS = atoi(argv[7]);
 
 
+  int maxPeepsWaiting = 0;
   for(int day = 0; day < DAYS; day++){
     //Initialize simulation
     initializeSim();
-    int maxPeepsWaiting = 0;
 
     int temp;
     while(!events.empty()){
-      cout << "Number of people waiting: " << employeesWaiting.size() << endl;
+      //cout << "Number of people waiting: " << employeesWaiting.size() << endl;
       if(maxPeepsWaiting < employeesWaiting.size())
         maxPeepsWaiting = employeesWaiting.size();
       
       Event* currentEvent = events.top();
       switch(currentEvent->type){
         case Event::ARRIVE:
-        cout << "Current Event Time " << currentEvent->time << ":  ";
-        cout << "arrival" << endl;
+        //cout << "Current Event Time " << currentEvent->time << ":  ";
+        //cout << "arrival" << endl;
         // cin >> temp;
         handleArrival(currentEvent);
         break;
         case Event::BOARD:
-        cout << "Current Event Time " << currentEvent->time << ":  ";
-        cout << "board" << endl;
+        //cout << "Current Event Time " << currentEvent->time << ":  ";
+        //cout << "board" << endl;
         // cin >> temp;
         handleBoard(currentEvent);
         break;
         case Event::UNBOARD:
-        cout << "Current Event Time " << currentEvent->time << ":  ";
-        cout << "unboard" << endl;
+        //cout << "Current Event Time " << currentEvent->time << ":  ";
+        //cout << "unboard" << endl;
         //cin >> temp;
         handleUnboard(currentEvent);
         break;
         case Event::GROUND:
-        cout << "Current Event Time " << currentEvent->time << ":  ";
-        cout << "ground" << endl;
+        //cout << "Current Event Time " << currentEvent->time << ":  ";
+        //cout << "ground" << endl;
         // cin >> temp;
         handleGround(currentEvent);
         break;
@@ -410,10 +410,10 @@ int main(int argc, char* argv[]){
         return -2;
       }
 
-	  cout << "Number of people waiting now: " << employeesWaiting.size() << endl << endl;
+	  //cout << "Number of people waiting now: " << employeesWaiting.size() << endl << endl;
     }
-    cout << "Max ppl waiting: " << maxPeepsWaiting << endl << endl;
   }
+  cout << "Max ppl waiting: " << maxPeepsWaiting << endl << endl;
 
 
 }
