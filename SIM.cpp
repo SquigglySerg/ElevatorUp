@@ -182,7 +182,7 @@ void handleBoard(Event* e){
 void handleUnboard(Event* e) {
   events.pop();
   
-  /*int peopleOff = elevators[e->elevator]->peoplePerFloor[e->floor];
+  int peopleOff = elevators[e->elevator]->peoplePerFloor[e->floor];
   int currentFloor = e->floor;
   
   if(currentFloor !=  elevators[e->elevator]->currentFloor){
@@ -196,12 +196,21 @@ void handleUnboard(Event* e) {
   elevators[e->elevator]->currentFloor = e->floor;
   
   if(elevators[e->elevator]->numPeople > 0){
-    
-  }*/
+	//Another Unboard Event
+  }
+  else{
+	//Elevator shoudl go to ground
+	Event* ground = new Event;
+	ground->type = Event::GROUND;
+	ground->elevator = e->elevator;
+	ground->time = e->time + eTime(currentFloor, 0);
+	ground->floor = 0;
+	events.push(ground);
+  }
   
   
   
-  int currentEleIndex = e->elevator;
+  /*int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
   int currentFloor = currentEle->currentFloor;
 
@@ -239,7 +248,7 @@ void handleUnboard(Event* e) {
     events.push(unboard);
 
     currentEle->currentFloor = firstUnbFloor;
-  }
+  }*/
 }
 
 void handleGround(Event* e) {
@@ -329,13 +338,12 @@ int main(int argc, char* argv[]){
         cout << "Current Event Time " << currentEvent->time << ":  ";
         cout << "unboard" << endl;
         cin >> temp;
- 		//events.pop();
         handleUnboard(currentEvent);
         break;
         case Event::GROUND:
         // cout << "ground" << endl;
         // cin >> temp;
-        // handleGround(currentEvent);
+        handleGround(currentEvent);
         break;
         default:
         return -2;
