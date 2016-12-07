@@ -198,7 +198,7 @@ void handleBoard(Event* e){
     }
 
     // update the waiting list
-    employeesWaiting.erase(employeesWaiting.begin(), employeesWaiting.begin() + peopleWaiting);
+    employeesWaiting.erase(employeesWaiting.begin(), employeesWaiting.begin() + peopleBoarding);
 
     int bTime = boardingTime[peopleBoarding];
     // enqueue first UNBOARD
