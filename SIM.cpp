@@ -189,14 +189,26 @@ void handleUnboard(Event* e) {
     cerr << "WRONG FLOOR!! " << currentFloor << " != " << elevators[e->elevator]->currentFloor << endl;
   }
   
-  
-  
   elevators[e->elevator]->peoplePerFloor[e->floor] = 0;
   elevators[e->elevator]->numPeople -= peopleOff;
   elevators[e->elevator]->currentFloor = e->floor;
   
   if(elevators[e->elevator]->numPeople > 0){
 	//Another Unboard Event
+	Event* unboard = new Event;
+	unboard->type = Event::UNBOARD;
+	unboard->elevator = e->elevator;
+
+	//Find next floor
+	for (int i = currentFloor; i < elevators[e->elevator]->peoplePerFloor.size(); i++){
+		if (elevators[e->elevator]->peoplePerFloor[i] > 0){
+			unboard->floor = i;
+			unboard->time = e->time + boardingTime[elevators[e->elevator]->peoplePerFloor[i]] + eTime(i, 0);
+		}
+	}
+	
+	events.push(unboard);
+	
   }
   else{
 	//Elevator shoudl go to ground
