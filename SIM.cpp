@@ -225,11 +225,6 @@ void handleUnboard(Event* e) {
   int peopleOff = elevators[e->elevator]->peoplePerFloor[e->floor];
   int currentFloor = e->floor;
   
-  if(currentFloor !=  elevators[e->elevator]->currentFloor){
-    cerr << "WRONG FLOOR!! " << currentFloor << " != " << elevators[e->elevator]->currentFloor << endl;
-	cin >> currentFloor;
-  }
-  
   elevators[e->elevator]->peoplePerFloor[e->floor] = 0;
   elevators[e->elevator]->numPeople -= peopleOff;
   elevators[e->elevator]->currentFloor = e->floor;
@@ -370,6 +365,7 @@ int main(int argc, char* argv[]){
   for(int day = 0; day < DAYS; day++){
     //Initialize simulation
     initializeSim();
+	cout << "Number of people waiting: " << employeesWaiting.size() << endl;
 
     int temp;
     while(!events.empty()){
@@ -390,7 +386,7 @@ int main(int argc, char* argv[]){
         case Event::UNBOARD:
         cout << "Current Event Time " << currentEvent->time << ":  ";
         cout << "unboard" << endl;
-        cin >> temp;
+        //cin >> temp;
         handleUnboard(currentEvent);
         break;
         case Event::GROUND:
@@ -401,6 +397,9 @@ int main(int argc, char* argv[]){
         default:
         return -2;
       }
+
+	  cout << "Number of people waiting now: " << employeesWaiting.size() << endl;
+	  cin >> temp;
     }
   }
 
