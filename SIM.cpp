@@ -136,7 +136,7 @@ void handleArrival(Event* e){
 void handleBoard(Event* e){
   events.pop();
 
-  //elevator = elevators[e->elevator]
+  /*//elevator = elevators[e->elevator]
   if (employeesWaiting.size() > 0){
 	  int peopleBoarding = (ELE_CAP > employeesWaiting.size() ? employeesWaiting.size() : ELE_CAP);
 
@@ -169,12 +169,12 @@ void handleBoard(Event* e){
 
 	  events.push(unboard);
 
-  }
+  }*/
   
   
   
   
-  /*int currentEleIndex = e->elevator;
+  int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
 
   int currentFloor =  0;
@@ -216,7 +216,7 @@ void handleBoard(Event* e){
     // mark the elevator used
     currentEle->currentFloor = firstUnbFloor;
     cout << "Unboard created at time = " << firstUnboard->time << endl;
-  }*/
+  }
 }
 
 void handleUnboard(Event* e) {
