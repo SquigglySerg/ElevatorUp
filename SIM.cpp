@@ -187,6 +187,7 @@ void handleUnboard(Event* e) {
   
   if(currentFloor !=  elevators[e->elevator]->currentFloor){
     cerr << "WRONG FLOOR!! " << currentFloor << " != " << elevators[e->elevator]->currentFloor << endl;
+	cin >> currentFloor;
   }
   
   elevators[e->elevator]->peoplePerFloor[e->floor] = 0;
