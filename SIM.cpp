@@ -181,7 +181,14 @@ void handleBoard(Event* e){
   currentEle->currentFloor = currentFloor;
   int peopleWaiting = employeesWaiting.size();
   if (peopleWaiting > 0) {
-    int peopleBoarding = (ELE_CAP > peopleWaiting? peopleWaiting : ELE_CAP);
+	int peopleBoarding; // = (ELE_CAP > peopleWaiting ? peopleWaiting : ELE_CAP);
+	if (ELE_CAP > peopleWaiting){
+		peopleBoarding = peopleWaiting;
+	}
+	else{
+		peopleBoarding = ELE_CAP;
+	}
+
     currentEle->numPeople = peopleBoarding;
 
     // board the first ten to current Elevator
