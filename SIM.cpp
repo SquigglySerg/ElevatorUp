@@ -423,7 +423,8 @@ int main(int argc, char* argv[]){
 	  //cout << "Number of people waiting now: " << employeesWaiting.size() << endl << endl;
     }
   }
-  cout << totalPedestrians << "total pedestrians over all days" << endl << endl;
+  cout << "\n*******************RUNNING RESULTS********************\n" << endl;
+  cout << totalPedestrians << " total pedestrians over all days" << endl << endl;
   cout << "Max ppl waiting: " << maxPeepsWaiting << endl << endl;
   cout << "Total stops over all days: " << stops << endl << endl;
   cout << "(Average stops) STOPS = " << (double) stops/DAYS/ELEVATORS << endl << endl;
