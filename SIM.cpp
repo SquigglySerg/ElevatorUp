@@ -49,6 +49,7 @@ double B;
 double GAP;
 ifstream pRNG;
 
+vector<int> totalPeoplePerFloor; // Make sure do not generate more than PEOPLE per floor
 
 double eTime (int startFloor, int endFloor) {
   int floorsTraveled = abs(endFloor - startFloor);
@@ -103,12 +104,13 @@ double generateArrival(double previousArrival, int floor){
 
 void handleArrival(Event* e){
   events.pop();
+  totalPeoplePerFloor[e->floor]++;
 
   employeesWaiting.push_back(e->floor);
 
   double nextA = generateArrival(e->time, e->floor);
 
-  if( nextA <= GAP*(e->floor-1)+B+A ){
+  if( nextA <= GAP*(e->floor-1)+B+A && totalPeoplePerFloor[e->floor] < PEOPLE){
     Event* ne = new Event;
     ne->type = Event::ARRIVE;
     ne->time = nextA;
@@ -170,10 +172,10 @@ void handleBoard(Event* e){
 	  events.push(unboard);
 
   }*/
-  
-  
-  
-  
+
+
+
+
   int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
 
@@ -204,7 +206,7 @@ void handleBoard(Event* e){
     // enqueue first UNBOARD
     Event* firstUnboard = new Event;
     firstUnboard->type = Event::UNBOARD;
-    
+
     int firstUnbFloor = 0;
     double unbTime;
     for (firstUnbFloor = currentFloor; firstUnbFloor <= FLOORS; firstUnbFloor++) {
@@ -228,14 +230,14 @@ void handleBoard(Event* e){
 
 void handleUnboard(Event* e) {
   events.pop();
-  
+
   int peopleOff = elevators[e->elevator]->peoplePerFloor[e->floor];
   int currentFloor = e->floor;
-  
+
   elevators[e->elevator]->peoplePerFloor[e->floor] = 0;
   elevators[e->elevator]->numPeople -= peopleOff;
   elevators[e->elevator]->currentFloor = e->floor;
-  
+
   if(elevators[e->elevator]->numPeople > 0){
 	//Another Unboard Event
 	Event* unboard = new Event;
@@ -249,9 +251,9 @@ void handleUnboard(Event* e) {
 			unboard->time = e->time + boardingTime[elevators[e->elevator]->peoplePerFloor[i]] + eTime(i, 0);
 		}
 	}
-	
+
 	events.push(unboard);
-	
+
   }
   else{
 	//Elevator shoudl go to ground
@@ -262,9 +264,9 @@ void handleUnboard(Event* e) {
 	ground->floor = 0;
 	events.push(ground);
   }
-  
-  
-  
+
+
+
   /*int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
   int currentFloor = currentEle->currentFloor;
@@ -334,7 +336,7 @@ void initializeSim() {
 
     events.push(firstArrival);
   }
-  
+
   for (int i = 0; i < ELEVATORS; i++) {
     // initialze elevators
     Elevator* ele = new Elevator;
@@ -345,6 +347,9 @@ void initializeSim() {
     ele->peoplePerFloor.assign(FLOORS + 1, 0);
     elevators.push_back(ele);
   }
+
+  totalPeoplePerFloor.resize(FLOORS + 1);
+  totalPeoplePerFloor.assign(FLOORS + 1, 0);
 }
 
 int main(int argc, char* argv[]){
@@ -370,6 +375,8 @@ int main(int argc, char* argv[]){
 
 
   int maxPeepsWaiting = 0;
+  int stops = 0;
+  int totalPedestrians = 0;
   for(int day = 0; day < DAYS; day++){
     //Initialize simulation
     initializeSim();
@@ -379,10 +386,11 @@ int main(int argc, char* argv[]){
       //cout << "Number of people waiting: " << employeesWaiting.size() << endl;
       if(maxPeepsWaiting < employeesWaiting.size())
         maxPeepsWaiting = employeesWaiting.size();
-      
+
       Event* currentEvent = events.top();
       switch(currentEvent->type){
         case Event::ARRIVE:
+        totalPedestrians++;
         //cout << "Current Event Time " << currentEvent->time << ":  ";
         //cout << "arrival" << endl;
         // cin >> temp;
@@ -395,12 +403,14 @@ int main(int argc, char* argv[]){
         handleBoard(currentEvent);
         break;
         case Event::UNBOARD:
+        stops++;
         //cout << "Current Event Time " << currentEvent->time << ":  ";
         //cout << "unboard" << endl;
         //cin >> temp;
         handleUnboard(currentEvent);
         break;
         case Event::GROUND:
+        stops++;
         //cout << "Current Event Time " << currentEvent->time << ":  ";
         //cout << "ground" << endl;
         // cin >> temp;
@@ -413,7 +423,9 @@ int main(int argc, char* argv[]){
 	  //cout << "Number of people waiting now: " << employeesWaiting.size() << endl << endl;
     }
   }
+  cout << totalPedestrians << "total pedestrians over all days" << endl << endl;
   cout << "Max ppl waiting: " << maxPeepsWaiting << endl << endl;
-
+  cout << "Total stops over all days: " << stops << endl << endl;
+  cout << "(Average stops) STOPS = " << (double) stops/DAYS/ELEVATORS << endl << endl;
 
 }
