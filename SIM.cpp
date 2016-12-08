@@ -179,10 +179,9 @@ void handleBoard(Event* e){
   int currentEleIndex = e->elevator;
   Elevator* currentEle = elevators[currentEleIndex];
 
-  int currentFloor =  0;
-  currentEle->currentFloor = currentFloor;
+  
   int peopleWaiting = employeesWaiting.size();
-  if (peopleWaiting > 0) {
+  if (peopleWaiting > 0 && currentEle->currentFloor == 0) {
 	int peopleBoarding; // = (ELE_CAP > peopleWaiting ? peopleWaiting : ELE_CAP);
 	if (ELE_CAP > peopleWaiting){
 		peopleBoarding = peopleWaiting;
@@ -190,6 +189,8 @@ void handleBoard(Event* e){
 	else{
 		peopleBoarding = ELE_CAP;
 	}
+	int currentFloor = 0;
+	currentEle->currentFloor = currentFloor;
 
     currentEle->numPeople = peopleBoarding;
 
@@ -248,7 +249,7 @@ void handleUnboard(Event* e) {
 	for (int i = currentFloor; i < elevators[e->elevator]->peoplePerFloor.size(); i++){
 		if (elevators[e->elevator]->peoplePerFloor[i] > 0){
 			unboard->floor = i;
-			unboard->time = e->time + boardingTime[elevators[e->elevator]->peoplePerFloor[i]] + eTime(i, 0);
+			unboard->time = e->time + boardingTime[elevators[e->elevator]->peoplePerFloor[i]] + eTime(currentFloor, i);
 		}
 	}
 
