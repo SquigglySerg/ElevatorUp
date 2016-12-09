@@ -367,7 +367,7 @@ int main(int argc, char* argv[]){
 	  catch(const std::out_of_range& m){
 	    	if(bin < 0)
 			bin = 0;
-		hist[bin] = 0;
+		hist[bin] = 1;
 	  }
   }
 
