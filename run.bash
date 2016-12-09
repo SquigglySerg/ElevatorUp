@@ -18,9 +18,35 @@ make
 #
 # ./SIM 5 4 0.1 15 5 uniform-0-1-00.dat 300
 
+
 #
-for i in `seq 1 10`;
+# for j in `seq 4 15`;
+for j in `seq 6 10`;
 do
-  echo "./SIM 6 $i 0.1 15 5 uniform-0-1-00.dat 300"
-  ./SIM 6 $i 0.1 15 5 uniform-0-1-00.dat 300
+  for i in `seq 1 50`;
+  do
+    # echo "./SIM $j $i 0.1 15 5 uniform-0-1-00.dat 300"
+    ./SIM $j $i 0 15 5 uniform-0-1-00.dat 300 > results.txt
+    # cat results.txt
+    lineNum=`cat results.txt | wc -l`
+    if (($lineNum <= 14)); then  # 14 is based on how many lines are outputted
+      # echo All under 6 minutes
+      # echo FLOORS = $j, S = $i
+      echo $i
+      # cat results.txt
+      # echo $lineNum
+      SPLUSONE=$(($i+1))
+      echo ./SIM $j $SPLUSONE 0 15 5 uniform-0-1-00.dat 300
+      ./SIM $j $SPLUSONE 0 15 5 uniform-0-1-00.dat 300 > results.txt
+      lineNum=`cat results.txt | wc -l`
+      cat results.txt
+      # echo $lineNum
+      echo ./SIM $j $i 0.07 15 5 uniform-0-1-00.dat 300
+      ./SIM $j $i 0.07 15 5 uniform-0-1-00.dat 300 > results.txt
+      cat results.txt
+      break;
+    fi
+
+
+  done
 done

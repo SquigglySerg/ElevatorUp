@@ -362,7 +362,7 @@ int main(int argc, char* argv[]){
   }
   cout << fixed << setprecision(5);
   cout << "*******************RUNNING RESULTS********************" << endl;
-  // cout << totalPedestrians << " total pedestrians" << endl;
+  cout << totalPedestrians << " total pedestrians" << endl;
   cout << "OUTPUT stops " << (double) stops/DAYS/ELEVATORS << endl;
   cout << "OUTPUT floors "  << (double) traveled/DAYS/ELEVATORS << endl;
   cout << "OUTPUT maxpedq " << maxPeepsWaiting << endl;
@@ -388,7 +388,7 @@ int main(int argc, char* argv[]){
   map<int,int>::iterator it = bins.begin();
   for (it=bins.begin(); it!=bins.end(); ++it) {
     // cout << it->first << " => " << it->second << '\n';
-    cout << "OUTPUT /" << it->first << "/ minutes "  << (double)it->second/totalPedestrians << endl;
+    cout << "OUTPUT /" << it->first << "/ minutes /"  << it->second << "/ " << (double)it->second/totalPedestrians << endl;
 
   }
   cout << endl << endl;
