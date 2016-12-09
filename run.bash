@@ -31,11 +31,15 @@ do
     lineNum=`cat results.txt | wc -l`
     if (($lineNum <= 14)); then  # 14 is based on how many lines are outputted
       # echo All under 6 minutes
-      # echo FLOORS = $j, S = $i
-      echo $i
+
+      # echo $i
       # cat results.txt
       # echo $lineNum
       SPLUSONE=$(($i+1))
+
+      echo //////////////////////////////////////////////////
+      echo ////////// FLOORS = $j, S = $i, S+1 = $SPLUSONE ////////////
+      echo //////////////////////////////////////////////////
       echo ./SIM $j $SPLUSONE 0 15 5 uniform-0-1-00.dat 300
       ./SIM $j $SPLUSONE 0 15 5 uniform-0-1-00.dat 300 > results.txt
       lineNum=`cat results.txt | wc -l`
