@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <limits>
 #include <algorithm>
+#include <map>
+#include <iomanip>
 
 using namespace std;
 
@@ -212,10 +214,17 @@ void handleBoard(Event* e){
 
     // calculate wait times
     for (int i = 0; i < peopleBoarding; i++) {
-      double wTime = unboardTimes[employeesWaiting[i].first] - employeesWaiting[i].second - (boardingTime[1] + boardingTime[1] + eTime(0, employeesWaiting[i].first));
+      int targetFloor = employeesWaiting[i].first;
+
+      unsigned index = 0;
+      for (; index < currentEle->peoplePerFloor.size(); index++) {
+        if (currentEle->peoplePerFloor[index].first == targetFloor) {
+          break;
+        }
+      }
+      double wTime = unboardTimes[index] - employeesWaiting[i].second - (boardingTime[1] + boardingTime[1] + eTime(0, employeesWaiting[i].first));
       waitTimes.push_back(wTime);
     }
-
 
     // update the waiting list
     employeesWaiting.erase(employeesWaiting.begin(), employeesWaiting.begin() + peopleBoarding);
@@ -351,15 +360,36 @@ int main(int argc, char* argv[]){
       //cout << "Number of people waiting now: " << employeesWaiting.size() << endl << endl;
     }
   }
-  cout << "\n*******************RUNNING RESULTS********************\n" << endl;
-  cout << totalPedestrians << " total pedestrians" << endl << endl;
-  cout << "OUTPUT stops " << (double) stops/DAYS/ELEVATORS << endl << endl;
-  cout << "OUTPUT floors "  << (double) traveled/DAYS/ELEVATORS << endl << endl;
-  cout << "OUTPUT maxpedq " << maxPeepsWaiting << endl << endl;
+  cout << fixed << setprecision(5);
+  cout << "*******************RUNNING RESULTS********************" << endl;
+  // cout << totalPedestrians << " total pedestrians" << endl;
+  cout << "OUTPUT stops " << (double) stops/DAYS/ELEVATORS << endl;
+  cout << "OUTPUT floors "  << (double) traveled/DAYS/ELEVATORS << endl;
+  cout << "OUTPUT maxpedq " << maxPeepsWaiting << endl;
 
-  cout << "size of waitTimes " << waitTimes.size() << endl;
+  // cout << "size of waitTimes " << waitTimes.size() << endl;
 
+  map<int, int> bins;
 
+  for (unsigned int i = 0; i < waitTimes.size(); i++) {
+    int bin = floor(waitTimes[i]);
+    if (abs(waitTimes[i]) < 0.000001 ) {
+      bin = 0;
+    }
+    pair<map<int,int>::iterator, bool> ret;
+    ret = bins.insert(pair<int, int>(bin, 1));
+    if (ret.second == false) {
+      ret.first->second++;
+    }
+  }
 
+  // showing contents:
+  cout << "our histogram:\n";
+  map<int,int>::iterator it = bins.begin();
+  for (it=bins.begin(); it!=bins.end(); ++it) {
+    // cout << it->first << " => " << it->second << '\n';
+    cout << "OUTPUT /" << it->first << "/ minutes "  << (double)it->second/totalPedestrians << endl;
 
+  }
+  cout << endl << endl;
 }
