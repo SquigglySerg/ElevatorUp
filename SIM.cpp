@@ -147,12 +147,7 @@ bool myComparison(const pair<int,int> &a,const pair<int,int> &b){
   return a.first < b.first;
 }
 
-void printPairVector(vector<pair<int, int> > v) {
-  for (int i = 0; i < v.size(); i++) {
-    cout << v[i].first << " " << v[i].second << endl;
-  }
-  cout << endl;
-}
+
 
 void handleBoard(Event* e){
   events.pop();
@@ -191,7 +186,7 @@ void handleBoard(Event* e){
       bool insertedBefore = false;
       for (unsigned int i = 0; i < currentEle->peoplePerFloor.size(); i++) {
         if (currentEle->peoplePerFloor[i].first == targetFloor) {
-          currentEle->peoplePerFloor[i].second = currentEle->peoplePerFloor[i].second + 1;
+          currentEle->peoplePerFloor[i].second++;
           insertedBefore = true;
         }
       }
@@ -205,14 +200,12 @@ void handleBoard(Event* e){
     sort(currentEle->peoplePerFloor.begin(), currentEle->peoplePerFloor.end(),myComparison);
 
 
-    printPairVector(currentEle->peoplePerFloor);
-
     int stopNum = currentEle->peoplePerFloor.size();
     vector<double> unboardTimes;
     unboardTimes.resize(stopNum);
 
 
-    unboardTimes[0] = e->time + boardingTime[peopleBoarding]; + eTime(0, currentEle->peoplePerFloor[0].first) + boardingTime[currentEle->peoplePerFloor[0].second];
+    unboardTimes[0] = e->time + boardingTime[peopleBoarding] + eTime(0, currentEle->peoplePerFloor[0].first) + boardingTime[currentEle->peoplePerFloor[0].second];
     for (int i = 1; i < stopNum; i++) {
       unboardTimes[i] = unboardTimes[i-1] + eTime(currentEle->peoplePerFloor[i-1].first, currentEle->peoplePerFloor[i].first) + boardingTime[currentEle->peoplePerFloor[i].second];
     }
@@ -365,6 +358,8 @@ int main(int argc, char* argv[]){
   cout << "OUTPUT maxpedq " << maxPeepsWaiting << endl << endl;
 
   cout << "size of waitTimes " << waitTimes.size() << endl;
+
+
 
 
 }
